@@ -29,7 +29,5 @@
 
 ## 图的基本表示
 
-### *邻接矩阵*
-
-<img src="/Volumes/T7 Shield/DS&A/Learning/Graph/README.assets/image-20240127160526295.png" alt="image-20240127160526295" style="zoom:33%;" />
+![image-20240127201153702](/Volumes/T7 Shield/DS&A/Learning/Graph/README.assets/image-20240127201153702.png)
 
