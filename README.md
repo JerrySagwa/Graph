@@ -29,5 +29,5 @@
 
 ## 图的基本表示
 
-![image-20240127201153702](/Volumes/T7 Shield/DS&A/Learning/Graph/README.assets/image-20240127201153702.png)
+![image-20240127201153702](./README.assets/image-20240127201153702.png)
 
