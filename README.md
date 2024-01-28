@@ -29,7 +29,17 @@
 
 ## 图的基本表示
 
-![image-20240127201153702](./README.assets/image-20240127201153702.png)
+
+
+| 实现 | 空间 | 建图 | hasEdge | adj  |
+| :-:-: | :-:-: | :--:--: | :--:--: | :-:-: |
+| AdjMatrix | O(V^2) | O(E) | O(1) |O(V)|
+| AdjList | O(V + E) | O(EV) | O(degree(v)) |O(degree(v))|
+| AdjSet | O(V + E) | O(ElogV) | O(degree(v)) |O(degree(v))|
+
+
+
+
 
 # DFS
 
