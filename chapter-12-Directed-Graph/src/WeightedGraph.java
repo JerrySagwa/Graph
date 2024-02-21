@@ -1,0 +1,182 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
+
+// 有向带权图
+public class WeightedGraph {
+
+    private int V;
+    private int E;
+    // key: vertex, value: weight
+    private TreeMap<Integer, Integer>[] adj;
+    private boolean directed;
+    private int[] indegrees;
+    private int[] outdegrees;
+
+    // O(E)
+    public WeightedGraph(String filename, boolean directed) {
+        this.directed = directed;
+        File file = new File(filename);
+
+        try {
+            Scanner scanner = new Scanner(file);
+            V = scanner.nextInt();
+            if (V < 0)
+                throw new IllegalArgumentException("V must be non-negative!");
+            adj = new TreeMap[V];
+            for (int i = 0; i < V; i++) {
+                adj[i] = new TreeMap<>();
+            }
+            indegrees = new int[V];
+            outdegrees = new int[V];
+            E = scanner.nextInt();
+            if (E < 0)
+                throw new IllegalArgumentException("E must be non-negative!");
+
+            for (int i = 0; i < E; i++) {
+                int a = scanner.nextInt();
+                validateVertex(a);
+                int b = scanner.nextInt();
+                validateVertex(b);
+                int weight = scanner.nextInt();
+                // 无向图
+                if (a == b) // 排除平行边和自环边
+                    throw new IllegalArgumentException("Self-Loop is not allowed!");
+                // 简单图
+                if (adj[a].containsKey(b))
+                    throw new IllegalArgumentException("Parallel Edge is not allowed!"); // O(logV)
+                adj[a].put(b, weight);
+                indegrees[b]++;
+                outdegrees[a]++;
+                if (!directed) // 有向图就不需要添加了
+                    adj[b].put(a, weight);
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public WeightedGraph(TreeMap<Integer, Integer>[] adj, boolean directed) {
+        this.directed = directed;
+        this.adj = adj;
+        this.V = adj.length;
+        this.indegrees = new int[V];
+        this.outdegrees = new int[V];
+        for (int i = 0; i < adj.length; ++i) {
+            this.E += adj[i].size();
+            for (Integer k : adj[i].keySet()) {
+                indegrees[k]++;
+                outdegrees[i]++;
+            }
+        }
+
+    }
+
+    public WeightedGraph(String filename) { // 默认为无向图
+        this(filename, false);
+    }
+
+    private void validateVertex(int v) {
+        if (v < 0 || v >= V)
+            throw new IllegalArgumentException("Vertex " + v + " is invalid!");
+    }
+
+    public int V() {
+        return V;
+    }
+
+    public int E() {
+        return E;
+    }
+
+    // O(1)
+    public boolean hasEdge(int v, int w) {
+        validateVertex(v);
+        validateVertex(w);
+        return adj[v].containsKey(w);
+    }
+
+    // O(V)
+    public Iterable<Integer> adj(int v) {
+        validateVertex(v);
+        return adj[v].keySet();
+    }
+
+    public boolean directed() {
+        return directed;
+    }
+
+    public int getWeight(int v, int w) {
+        if (hasEdge(v, w))
+            return adj[v].get(w);
+        throw new IllegalArgumentException(String.format("No edge %d %d", v, w));
+    }
+
+    public void removeEdge(int v, int w) {
+        validateVertex(v);
+        validateVertex(w);
+        if (adj[v].containsKey(w)) {
+            E--;
+            if (directed) {
+                outdegrees[v]--;
+                indegrees[w]--;
+            }
+        }
+        adj[v].remove(w);
+        if (!directed) adj[w].remove(v);
+    }
+
+    public int degree(int v) {
+        if (directed)
+            throw new IllegalArgumentException("Only works for directed graph!");
+        validateVertex(v);
+        return adj[v].size();
+    }
+
+    public int indegree(int v) {
+        validateVertex(v);
+        return indegrees[v];
+    }
+
+    public int outdegree(int v) {
+        validateVertex(v);
+        return outdegrees[v];
+    }
+
+    public WeightedGraph reverseGraph() {
+        TreeMap<Integer, Integer>[] radj = new TreeMap[adj.length];
+        for (int i = 0; i < radj.length; i++) {
+            radj[i] = new TreeMap<>();
+        }
+
+        for (int i = 0; i < adj.length; i++) {
+            for (Map.Entry<Integer, Integer> entry : adj[i].entrySet()) {
+                radj[entry.getKey()].put(i, entry.getValue());
+            }
+        }
+
+        return new WeightedGraph(radj, true);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("V = %d, E = %d, directed = %b\n", V, E, directed));
+        for (int v = 0; v < V; v++) {
+            sb.append(v + " : ");
+            for (int w : adj[v].keySet()) { // v;
+                sb.append(String.format("(%d: %d)", w, adj[v].get(w)));
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        WeightedGraph weightedGraph = new WeightedGraph("wg.txt", true);
+        System.out.println(weightedGraph);
+    }
+}
